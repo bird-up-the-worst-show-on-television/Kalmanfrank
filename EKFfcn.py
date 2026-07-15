@@ -151,7 +151,7 @@ class EKFfcn:
     def ekf_step(self, VYmeas, VXmeas, rmeas, Axmeas,
                 Xcov, Ycov,
                 Ppri_flat, Xpri_arr,
-                startflag, SA):
+                startflag, SA, Ts):
         """
         Extended Kalman Filter step.
         """
@@ -189,8 +189,8 @@ class EKFfcn:
         Abiaspri = Xpri[6]
 
         # ---- predict ----
-        fk = self._little_f(Vypri, Vxpri, rpri, Psipri, Axpri, Rbiaspri, Abiaspri, delta)
-        Fk = self._big_f(   Vypri, Vxpri, rpri, Psipri, Axpri, Rbiaspri, Abiaspri, delta)
+        fk = self._little_f(Vypri, Vxpri, rpri, Psipri, Axpri, Rbiaspri, Abiaspri, delta, Ts=Ts)
+        Fk = self._big_f(   Vypri, Vxpri, rpri, Psipri, Axpri, Rbiaspri, Abiaspri, delta, Ts=Ts)
 
         Ppost = Fk @ Ppredict @ Fk.T + Qk
 

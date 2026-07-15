@@ -5,8 +5,8 @@ from EKFfcn import EKFfcn
 import matplotlib.pyplot as plt
 import math
 
-GPS_FILE = "/home/lpschexn/Kalmanfrank/res/Lot24CRCGPS.csv"
-INS_FILE = "/home/lpschexn/Kalmanfrank/res/Lot24CRCINS.csv"
+GPS_FILE = "C:/Research/Drift Car/Vehicle model/Matlab-Simulink/Kalmanfrank/res/Lot24CRCGPS.csv"
+INS_FILE = "C:/Research/Drift Car/Vehicle model/Matlab-Simulink/Kalmanfrank/res/Lot24CRCINS.csv"
 
 NUM_STATES = 7
 NUM_MEASUREMENTS = 4
@@ -31,7 +31,6 @@ ins_wz_lpf = ins_data["field.angular_velocity.z"].rolling(window=INS_WINDOW, min
 ins_ax_lpf = ins_data["field.linear_acceleration.x"].rolling(window=INS_WINDOW, min_periods=1).mean()
 
 ins_gps_pub_ratio = math.floor(ins_wz_lpf.shape[0] / gps_data.shape[0])
-
 start_flag = True
 
 ekf = EKFfcn()
@@ -54,12 +53,14 @@ for i in range(0, gps_data.shape[0]):
     ins_idx = i * ins_gps_pub_ratio
     # ins = ins_data.iloc[ins_idx]
 
+    dt = 0.107
+
     P_pri, X_pri, residual, predicted_state, R_bias_prior, A_bias_prior = ekf.ekf_step(
         gps["field.twist.twist.linear.y"],gps["field.twist.twist.linear.x"],
         ins_wz_lpf.iloc[ins_idx], ins_ax_lpf.iloc[ins_idx],
         gps["field.twist.covariance0"], gps["field.twist.covariance0.1"],
         P_pri, X_pri,
-        start_flag, steering_angle)
+        start_flag, steering_angle, Ts=dt)
 
     if start_flag:
         start_flag = False
